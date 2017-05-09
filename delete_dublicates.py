@@ -65,7 +65,6 @@ def remove_duplicates(dublicate_list, original_list):
 
 
 def delete_dublicates(f_type, dublicate_path, original_path, warning_time=5):
-    log = Logger()
     deleted_count = 0
     count_size = 0
 
@@ -93,18 +92,16 @@ def delete_dublicates(f_type, dublicate_path, original_path, warning_time=5):
         for i in range(thread_max):
             executor.submit(remove_duplicates, dublicate_list[i:d_len:thread_max], original_list)
 
-    log.shutdown()
-
 
 def continuously_delete_dublicates(dublicate_path, original_path):
     while True:
         for t in [""]:  # [".mp3", ".jpg", ".m4a", ".flac", ".flv", ".avi", ".wma", ".ogg", ".wav"]:
             delete_dublicates(f_type=t, dublicate_path=dublicate_path, original_path=original_path,
                               warning_time=0)
-        #            delete_dublicates(f_type=t, dublicate_path=dublicate_path, original_path=original_path,
-        #                             warning_time=0)
 
 
-delete_dublicates(f_type=[""], dublicate_path="D:/Downloads/Handy Alt Merge/Anderes",
-                  original_path="D:/Musik",
-                  warning_time=5)
+if __name__ == "__main__":
+    with Logger():
+        delete_dublicates(f_type=[""], dublicate_path="D:/Downloads/Handy Alt Merge/Anderes",
+                          original_path="D:/Musik",
+                          warning_time=5)
