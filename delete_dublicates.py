@@ -1,6 +1,7 @@
 from logging import info, error
 from time import sleep
-from concurrent.futures import ThreadPoolExecutor
+# from concurrent.futures import ThreadPoolExecutor
+from utility.threadPoolExecutor import ThreadPoolExecutor
 from utility.logger import Logger
 from utility.os_interface import depth_search_files, get_file_size, delete_file
 from difflib import SequenceMatcher
@@ -14,7 +15,7 @@ def show_dialog(s):
 
 def is_similar_fit(a, b):
     similarity = SequenceMatcher(None, a, b).ratio()
-    if similarity >= 0.85:
+    if similarity >= 1.0:
         # info("#ACCEPT " + str(similarity))
         return True
     return False
@@ -23,8 +24,6 @@ def is_similar_fit(a, b):
 def is_duplicate(d_file, original_list):
     for o_file in original_list:
         # NAME
-        # :
-        # if o_file[1] == d_file[1] or \
         if is_similar_fit(o_file[1], d_file[1]):
             # PATH
             if o_file[0] != d_file[0]:
@@ -43,22 +42,19 @@ def remove_duplicates(dublicate_list, original_list):
     deleted_count = 0
     for d_file in dublicate_list:
 
-        try:
-            # logging.info("TEST FILE:  " + d_file[1])
-            # if d_file[1] != "Collection": TODO ????
-            if is_duplicate(d_file, original_list):
-                # info("Duplicat Path:  " + d_file[0])
-                info("Duplicat NAME:  " + d_file[1])
-                d_size = get_file_size(d_file[0], d_file[1])
-                # info("Duplicat Size:  " + str(d_size))
+        # logging.info("TEST FILE:  " + d_file[1])
+        # if d_file[1] != "Collection": TODO ????
+        if is_duplicate(d_file, original_list):
+            # info("Duplicat Path:  " + d_file[0])
+            info("Duplicat NAME:  " + d_file[1])
+            d_size = get_file_size(d_file[0], d_file[1])
+            # info("Duplicat Size:  " + str(d_size))
 
-                # show_dialog(4)
-                if delete_file(d_file[0], d_file[1]):
-                    count_size += d_size
-                    #  info("TOTAL SIZE DELETE:  " + str(count_size))
-                    deleted_count += 1
-        except Exception as e:
-            error(e)
+            # show_dialog(4)
+            if delete_file(d_file[0], d_file[1]):
+                count_size += d_size
+                #  info("TOTAL SIZE DELETE:  " + str(count_size))
+                deleted_count += 1
 
     info("TOTAL SIZE DELETE:  " + str(count_size))
     info("DELETE:  " + str(deleted_count) + " of " + str(len(dublicate_list)))
@@ -75,8 +71,10 @@ def delete_dublicates(f_type, dublicate_path, original_path, warning_time=5):
     else:
         original_list = depth_search_files(original_path, f_type)
         dublicate_list = depth_search_files(dublicate_path, f_type)
-        original_list = sorted(original_list, key=lambda x: x[1])
+        original_list = sorted(original_list, key=lambda x: x[1])  # sort alphabet
+        original_list = sorted(original_list, key=lambda x: len(x[1]))  # sort lenght of file name
         dublicate_list = sorted(dublicate_list, key=lambda x: x[1])
+        dublicate_list = sorted(dublicate_list, key=lambda x: len(x[1]))
     d_len = len(dublicate_list)
 
     info("DELETE FROM   " + dublicate_path)
@@ -102,6 +100,6 @@ def continuously_delete_dublicates(dublicate_path, original_path):
 
 if __name__ == "__main__":
     with Logger():
-        delete_dublicates(f_type=[""], dublicate_path="D:/Downloads/Handy Alt Merge/Anderes",
+        delete_dublicates(f_type=["mp3"], dublicate_path="D:/Merge",
                           original_path="D:/Musik",
                           warning_time=5)
